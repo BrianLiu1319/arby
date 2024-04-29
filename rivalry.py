@@ -39,3 +39,5 @@ def parse_rivalry():
         rivalry_parsed[time] = bundle
 
     return rivalry_parsed
+
+print(parse_rivalry())

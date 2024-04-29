@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 
 
+
 def update_tp_html():
     driver = webdriver.Chrome()
     url = "https://thunderpick.io/esports/valorant"
@@ -20,44 +21,49 @@ def update_tp_html():
     with open("thunderpick.html", "a", encoding="utf-8") as file:
             file.write(soup.prettify())
             
-# # def parse_rivalry():
-#     with open("rivalry.html", "r", encoding="utf-8") as file:
-#         contents = file.read()
-#         soup = BeautifulSoup(contents, "html.parser")
-#         bets = [i for i in soup.find_all(class_="betline m-auto betline-wide mb-0")]
-
-#     rivalry_parsed = dict()
-#     for i in bets:
-#         # [BLEED, PRX]
-#         teams = [
-#             " ".join(j.get_text().split()) for j in i.find_all(class_="outcome-name")
-#         ]
-#         # [5.0, 1.9]
-#         odds = [
-#             " ".join(j.get_text().split()) for j in i.find_all(class_="outcome-odds")
-#         ]
-#         # Apr 27 08:00 UTC
-#         time = " ".join(
-#             i.find(class_="text-navy dark:text-[#CFCFD1] leading-3 text-[11px]")
-#             .get_text()
-#             .split()
-#         )
-#         # {BLEED: 5.0, PRX:1.9}
-#         bundle = dict(zip(teams, odds))
-#         rivalry_parsed[time] = bundle
-
-#     return rivalry_parsed
-
-
-with open("thunderpick.html", "r", encoding="utf-8") as file:
-    contents = file.read()
-    soup = BeautifulSoup(contents, "html.parser")
+def odds_converter(odd):
+    '''
+    If the American odds are positive the formula is as follows: (American odds / 100) + 1 = decimal odds. 
+    If the American odds are negative, the formula is as follows: (100 / American odds) + 1 = decimal odds.
+    '''
     
-a = soup.find_all(class_='match-group')
+    if odd < 0:
+        bet = 100/odd + 1
+    elif odd > 0:
+        bet = odd/100 + 1
+    else:
+        bet = 0
+    
+    return round(bet,2)
 
-print(len(a))
+def parse_thunderpick():
+    with open("thunderpick.html", "r", encoding="utf-8") as file:
+        contents = file.read()
+        soup = BeautifulSoup(contents, "html.parser")
+        
+    teams_a = [" ".join(i.get_text().split()) for i in soup.find_all(class_='JQKgtcAgUQTANhiXNrDX gcdjvGuPdJzgc15U5aZA')]
+    teams_b = [" ".join(i.get_text().split()) for i in soup.find_all(class_='ndI7usEcCflSQxesRMDy gcdjvGuPdJzgc15U5aZA')]
+    odds = [odds_converter(int(" ".join(i.get_text().split()))) for i in soup.find_all(class_='odds-button__odds')]          
+    
+    odds_a = odds[1::2]
+    odds_b = odds[::2]
+   
+   # somehow get it into Apr 27 08:00 UTC
+   
+   
+    dates = [" ".join(i.get_text().split()) for i in soup.find_all(class_='match-group-title section-header')]
+    time = [" ".join(i.get_text().split()) for i in soup.find_all(class_='Igl6giMaBcs0doY3mQ6Y')]
+    
+    print(dates)
+    print(time)
+    
+
+    
 
 
+    
+# update_tp_html()
+parse_thunderpick()
 
 
 
