@@ -40,4 +40,6 @@ def parse_rivalry():
 
     return rivalry_parsed
 
-print(parse_rivalry())
+
+update_rivalry_html()
+parse_rivalry()
