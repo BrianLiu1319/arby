@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
 
-
 # update rivalry.html
 def update_rivalry_html():
     response = requests.get("https://www.rivalry.com/esports/valorant-betting")
@@ -41,5 +40,3 @@ def parse_rivalry():
     return rivalry_parsed
 
 
-update_rivalry_html()
-parse_rivalry()
