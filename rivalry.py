@@ -12,6 +12,11 @@ def update_rivalry_html():
 
 # parse rivalry html
 def parse_rivalry():
+    """
+    # input: none (just read from html)
+    # output : dict {'time' : {'teama': odd, 'teamb': odd} }
+    
+    """
     with open("rivalry.html", "r", encoding="utf-8") as file:
         contents = file.read()
         soup = BeautifulSoup(contents, "html.parser")
@@ -35,8 +40,10 @@ def parse_rivalry():
         )
         # {BLEED: 5.0, PRX:1.9}
         bundle = dict(zip(teams, odds))
+        # 'Jun 14 01:15 UTC': {'FUSION': '1.53', 'Six Karma': '2.30'}
         rivalry_parsed[time] = bundle
 
     return rivalry_parsed
 
+print(parse_rivalry())
 
