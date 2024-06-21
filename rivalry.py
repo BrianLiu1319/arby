@@ -36,7 +36,7 @@ def parse_rivalry():
         time = " ".join(
             i.find(class_="text-navy dark:text-[#CFCFD1] leading-3 text-[11px]")
             .get_text()
-            .split()
+            .split()[:-1]
         )
         # {BLEED: 5.0, PRX:1.9}
         bundle = dict(zip(teams, odds))
@@ -45,5 +45,6 @@ def parse_rivalry():
 
     return rivalry_parsed
 
+# we can iterate through .keys and .values
 print(parse_rivalry())
 
