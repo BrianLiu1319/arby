@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import dateparser
 
+
 # update rivalry.html
 def update_rivalry_html():
     response = requests.get("https://www.rivalry.com/esports/valorant-betting")
@@ -16,14 +17,14 @@ def parse_rivalry():
     """
     # input: none (just read from html)
     # output : dict {'time' : {'teama': odd, 'teamb': odd} }
-    
+
     """
     with open("rivalry.html", "r", encoding="utf-8") as file:
         contents = file.read()
         soup = BeautifulSoup(contents, "html.parser")
         bets = [i for i in soup.find_all(class_="betline m-auto betline-wide mb-0")]
 
-    rivalry_parsed = dict()
+    parsed_dict = dict()
     for i in bets:
         # [BLEED, PRX]
         teams = [
@@ -34,19 +35,25 @@ def parse_rivalry():
             " ".join(j.get_text().split()) for j in i.find_all(class_="outcome-odds")
         ]
         # Apr 27 08:00 UTC
-        time =  i.find(class_="text-navy dark:text-[#CFCFD1] leading-3 text-[11px]").get_text().split()[:-1]
-        time.insert(2, '2024')
+        time = (
+            i.find(class_="text-navy dark:text-[#CFCFD1] leading-3 text-[11px]")
+            .get_text()
+            .split()
+        )
+        time.insert(2, "2024")
         time = " ".join(time)
         time = dateparser.parse(time)
-        time = time.strftime('%Y-%m-%d %H:%M:%S')
-        # {BLEED: 5.0, PRX:1.9}
+        time = time.strftime("%Y-%m-%d")
+        
+
         bundle = dict(zip(teams, odds))
-        # 'Jun 14 01:15': {'FUSION': '1.53', 'Six Karma': '2.30'}
-            
-        rivalry_parsed[time] = bundle
+        
+        if time in parsed_dict:
+            parsed_dict[time].append(bundle)
+        else:
+            parsed_dict[time] = list()
+            parsed_dict[time].append(bundle)
 
-    return rivalry_parsed
+    return parsed_dict
 
-# we can iterate through .keys and .values
 print(parse_rivalry())
-

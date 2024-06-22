@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 @dataclass
-class Team:
+class TeamS:
     name: str
     odd : str
     time: str
