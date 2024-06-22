@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import time
 
 from datetime import datetime, timedelta, timezone
+import dateparser
 
 def pacific_to_utc(pacific_time_str):
     # Define Pacific Time Zone (PT)
@@ -88,11 +89,10 @@ def parse_thunderpick():
         soup = BeautifulSoup(contents, "html.parser")
    
     # dates = soup.find(class_='match-group-title section-header')
-    section = []
     # parse by each batch match bc this is weird
     ## match-group gives us all the matches happening on that date
+    parsed_dict = {}
     for i in soup.find_all(class_ = 'match-group'):
-        section.append(str(i))   
         temp_soup = BeautifulSoup(str(i), "html.parser")
         
         # get batch match date: class="match-group-title section-header"
@@ -100,9 +100,9 @@ def parse_thunderpick():
         
         # get time for each individual match : <div class="Igl6giMaBcs0doY3mQ6Y"> <span class=""> 02:00 </span>
         time = [" ".join(j.get_text().split()) for j in temp_soup.find_all(class_='Igl6giMaBcs0doY3mQ6Y')]  
-        time = [pacific_to_utc(i)  for i in time]  
         
         # convert time
+        time = [pacific_to_utc(i)  for i in time]  
         
         # get team_as []
         teams_a = [" ".join(j.get_text().split()) for j in temp_soup.find_all(class_='JQKgtcAgUQTANhiXNrDX gcdjvGuPdJzgc15U5aZA')]
@@ -121,23 +121,22 @@ def parse_thunderpick():
         odds_a = odds[::2] 
         odds_b = odds[1::2]
         
-        print(dates)
-        print(time)
-        # print(teams_a)
-        # print(odds_a)
-        # print(teams_b)
-        # print(odds_b)
-        
-        # bundle team_a : odd and team_b : oddb
-        team_dict = {}
+        # bundle : {'dates + time': {teama:odd} {teamb:odd}, .... }
         
         for i in range(len(teams_a)):
+            team_dict = {}
             team_dict[teams_a[i]] = odds_a[i]
             team_dict[teams_b[i]] = odds_b[i] 
+
             
-        # bundle : {'dates + time': {teama:odd} {teamb:odd}, .... } 
+            date = dateparser.parse(dates + ',' + time[i])
+            
+            if date != None:
+                date = date.strftime('%Y-%m-%d %H:%M:%S')
+                parsed_dict[date] = team_dict
         
-   
+    return parsed_dict
+    
     
 parse_thunderpick()
 

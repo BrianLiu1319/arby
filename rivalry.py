@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+import dateparser
 
 # update rivalry.html
 def update_rivalry_html():
@@ -33,14 +34,15 @@ def parse_rivalry():
             " ".join(j.get_text().split()) for j in i.find_all(class_="outcome-odds")
         ]
         # Apr 27 08:00 UTC
-        time = " ".join(
-            i.find(class_="text-navy dark:text-[#CFCFD1] leading-3 text-[11px]")
-            .get_text()
-            .split()[:-1]
-        )
+        time =  i.find(class_="text-navy dark:text-[#CFCFD1] leading-3 text-[11px]").get_text().split()[:-1]
+        time.insert(2, '2024')
+        time = " ".join(time)
+        time = dateparser.parse(time)
+        time = time.strftime('%Y-%m-%d %H:%M:%S')
         # {BLEED: 5.0, PRX:1.9}
         bundle = dict(zip(teams, odds))
-        # 'Jun 14 01:15 UTC': {'FUSION': '1.53', 'Six Karma': '2.30'}
+        # 'Jun 14 01:15': {'FUSION': '1.53', 'Six Karma': '2.30'}
+            
         rivalry_parsed[time] = bundle
 
     return rivalry_parsed

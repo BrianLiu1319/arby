@@ -13,3 +13,7 @@ def lev_ratio (str1, str2):
     return ratio
     
 print(lev_ratio('SUn', "saturn"))
+
+stri = "wtf tha brown"
+
+print(stri.split().insert(3, 'sdfskdjn'))
