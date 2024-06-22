@@ -8,6 +8,7 @@ import sqlite3
 def update_html():
     """
     simply update html of both rv and tp
+    
     input : none
     output: none
     """
@@ -32,7 +33,8 @@ def update_html():
 # parse html
 def parse_html():
     """
-    parse thru html and return tuple of TEAMA and TEAMB
+    parse thru html of rv and tp
+    
     input: none
     output: dict (rv), dict (tp) 
     """
@@ -60,9 +62,7 @@ print(rv_dict)
 print('\n\n\n\n')
 print(tp_dict)
 
-# we want two fucntions to return tuples of : {event, time, TEAM_A, TEAM_B}
-# fuzzy match with events, teama and teamb to pair and return {{tp ,{tuple}}, {rv, {tuple}}}
-
+# get list of dates and now we want to 
 
 # TODO
 # match up teams between both data sets

@@ -6,6 +6,12 @@ import dateparser
 
 
 def pacific_to_utc(pacific_time_str):
+    """
+    convert PT to UTC
+    
+    input: date
+    output: date
+    """
     # Define Pacific Time Zone (PT)
     PT = timezone(timedelta(hours=-7))  # PT is UTC-8
     try:
@@ -24,7 +30,12 @@ def pacific_to_utc(pacific_time_str):
 
 
 def scroll_down(driver):
-    """A method for scrolling the page."""
+    """
+    A method for scrolling the page.
+    
+    input : selenium driver
+    output: none
+    """
 
     # Get scroll height.
     while True:
@@ -48,6 +59,12 @@ def scroll_down(driver):
 
 
 def update_tp_html():
+    '''
+    painstakenly update our html via selenium - opens up chrome and scrolls automatically
+    
+    # input : nothing
+    # output : nothing
+    '''
     options = webdriver.ChromeOptions()
     userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.56 Safari/537.36"
     options.add_argument(f"user-agent={userAgent}")
@@ -84,6 +101,8 @@ def odds_converter(odds):
 
 def parse_thunderpick():
     """
+    painstakenly parse through our tp html
+    
     # input : none - just read html file from update html
     # output : dict {'date' : list[{'teama': odd, 'teamb': odd},{}...] }
     """
@@ -162,6 +181,3 @@ def parse_thunderpick():
                     parsed_dict[date].append(team_dict)
 
     return parsed_dict
-
-
-print(parse_thunderpick())

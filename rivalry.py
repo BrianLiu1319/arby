@@ -5,6 +5,12 @@ import dateparser
 
 # update rivalry.html
 def update_rivalry_html():
+    """
+    simply update html for rivalry
+    
+    # input : none 
+    # output : none - just output a html file
+    """
     response = requests.get("https://www.rivalry.com/esports/valorant-betting")
     soup = BeautifulSoup(response.content, "html.parser")
 
@@ -15,6 +21,8 @@ def update_rivalry_html():
 # parse rivalry html
 def parse_rivalry():
     """
+    simply parse thru html
+    
     # input: none (just read from html)
     # output : dict {'time' : {'teama': odd, 'teamb': odd} }
 
