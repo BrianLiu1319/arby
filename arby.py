@@ -53,16 +53,56 @@ def parse_html():
 # update html
 # update_html()
 
+def store_into_class(rv_dict, tp_dict):
+    '''
+    store dictionary into classes by matching with fuzzy matching
+    
+    input : dict , dict 
+    output: list of TEAM.py class
+    
+    '''
+    
+    rv_dict, tp_dict = parse_html()
+    
 
+    print(rv_dict.keys())
+    print('\n\n\n\n')
+    print(rv_dict)
+    print('\n\n\n\n')
+    print(tp_dict)
+
+    # get list of dates, get smallest key list
+    len_rv = len(rv_dict.keys())
+    len_tp = len(tp_dict.keys())
+    
+    # use the smallest key list 
+    if len_rv < len_tp:
+        small_dict_key = rv_dict.keys()
+    else:
+        small_dict_key = tp_dict.keys()
+    
+# want to store into class
+    
 rv_dict, tp_dict = parse_html()
 
-print(rv_dict.keys())
+
+print(type(rv_dict.keys()))
 print('\n\n\n\n')
 print(rv_dict)
 print('\n\n\n\n')
 print(tp_dict)
 
-# get list of dates and now we want to 
+# get list of dates, get smallest key list
+len_rv = len(rv_dict.keys())
+len_tp = len(tp_dict.keys())
+
+# use the smallest key list 
+if len_rv < len_tp:
+    small_dict_key = rv_dict.keys()
+else:
+    small_dict_key = tp_dict.keys()
+    
+
 
 # TODO
 # match up teams between both data sets
@@ -70,3 +110,8 @@ print(tp_dict)
 # host on ac3
 # perform arbitrage
 # create a front facing website?
+
+def main():
+    update_html()
+    rv_dict, tp_dict = parse_html()
+    store_into_class(rv_dict, tp_dict)
