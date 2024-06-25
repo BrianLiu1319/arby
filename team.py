@@ -12,7 +12,7 @@ class Team:
         self.odd_tp = odd_tp
         
 @dataclass
-class match:
+class Match:
     date: str
     team_a : Team
     team_b : Team

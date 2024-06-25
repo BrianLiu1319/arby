@@ -15,7 +15,6 @@ def update_html():
     input : none
     output: none
     """
-
     # check if html exists delete elsewise
     import os
 
@@ -56,13 +55,14 @@ def parse_html():
 # update html
 # update_html()
 
+
 def flip_bits(binary_string):
     # Ensure the input is a valid binary string
-    if not set(binary_string).issubset({'0', '1'}):
+    if not set(binary_string).issubset({"0", "1"}):
         raise ValueError("Input must be a binary string containing only '0' and '1'")
 
     # Flip the bits using a list comprehension
-    flipped_string = ''.join('1' if bit == '0' else '0' for bit in binary_string)
+    flipped_string = "".join("1" if bit == "0" else "0" for bit in binary_string)
     return flipped_string
 
 
@@ -74,14 +74,7 @@ def store_into_class(rv_dict, tp_dict):
     output: list of TEAM.py class
 
     """
-
     rv_dict, tp_dict = parse_html()
-
-    print(rv_dict.keys())
-    print("\n\n\n\n")
-    print(rv_dict)
-    print("\n\n\n\n")
-    print(tp_dict)
 
     # get list of dates, get smallest key list
     len_rv = len(rv_dict.keys())
@@ -93,79 +86,53 @@ def store_into_class(rv_dict, tp_dict):
     else:
         small_dict_key = tp_dict.keys()
 
+    # what the fuck ???
+    viable_matches = []
+    # get list of dates
+    for i in small_dict_key:
+        # get list of rv matches on date
+        for j in rv_dict[i]:
+            rv_teams = list(j.keys())
+            tp_teams = tp_dict[i]
+            # get list of tp matches on date
+            for l in tp_teams:
+                l_key = list(l.keys())
 
-# want to store into class
+                # calculate fuzzy match ratios and match teams from rv and tp at the same time
+                ratio1 = fuzz.avg_ratio(rv_teams[0], l_key[0])
+                ratio2 = fuzz.avg_ratio(rv_teams[0], l_key[1])
+                ratio3 = fuzz.avg_ratio(rv_teams[1], l_key[0])
+                ratio4 = fuzz.avg_ratio(rv_teams[1], l_key[1])
 
-rv_dict, tp_dict = parse_html()
+                # get avg ratios and test if they are similar enough
+                ratio_list = [ratio1, ratio2, ratio3, ratio4]
+                index_max = np.argmax(ratio_list)
+                ratio_list.sort()
 
+                # if match is good pair up tp and rv and store into match
+                if ratio_list[-1] > 70 and ratio_list[-2] > 70:
+                    bits = format(index_max, "b").zfill(2)
+                    bits_flipped = flip_bits(bits)
 
-# print(type(rv_dict.keys()))
-# print('\n\n\n\n')
-# print(rv_dict)
-# print('\n\n\n\n')
-# print(tp_dict)
+                    team_a = team.Team(
+                        name=rv_teams[int(bits[0])],
+                        odd_rv=j[rv_teams[int(bits[0])]],
+                        odd_tp=l[l_key[int(bits[1])]],
+                    )
+                    team_b = team.Team(
+                        name=rv_teams[int(bits_flipped[0])],
+                        odd_rv=j[rv_teams[int(bits_flipped[0])]],
+                        odd_tp=l[l_key[int(bits_flipped[1])]],
+                    )
+                    match = team.Match(date=i, team_a=team_a, team_b=team_b)
+                    viable_matches.append(match)
 
-# get list of dates, get smallest key list
-len_rv = len(rv_dict.keys())
-len_tp = len(tp_dict.keys())
-
-# use the smallest key list
-if len_rv < len_tp:
-    small_dict_key = list(rv_dict.keys())
-else:
-    small_dict_key = list(tp_dict.keys())
-
-
-# what the fuck
-for i in small_dict_key:
-    for j in rv_dict[i]:
-        rv_teams = list(j.keys())
-        tp_teams = tp_dict[i]
-        for l in tp_teams:
-            l_key = list(l.keys())
-            ratio1 = fuzz.avg_ratio(rv_teams[0], l_key[0])
-            ratio2 = fuzz.avg_ratio(rv_teams[0], l_key[1])
-            ratio3 = fuzz.avg_ratio(rv_teams[1], l_key[0])
-            ratio4 = fuzz.avg_ratio(rv_teams[1], l_key[1])
-
-            ratio_list = [ratio1, ratio2, ratio3, ratio4]
-            index_max = np.argmax(ratio_list)
-            
-            ratio_list.sort()
-
-            if ratio_list[-1] > 70 and ratio_list[-2] > 70:
-
-                # might be in different order so we pick the pair with the highest fuzzy match
-                print(j, l)
-                print(rv_teams)
-                print(l_key)
-
-                bits = format(index_max, 'b').zfill(2)
-                bits_flipped = flip_bits(bits)
-                print(bits)
-                print(bits_flipped)
-                print(rv_teams[int(bits[0])])
-                print(l_key[int(bits[1])])
-                print(rv_teams[int(bits_flipped[0])])
-                print(l_key[int(bits_flipped[1])])
-                
-                
-                
-                
+    return viable_matches
 
 
-# we want to search and remove from list
-
-
-# TODO
-# match up teams between both data sets
-# pair them up into sqllite
-# host on ac3
-# perform arbitrage
-# create a front facing website?
-
-
-def main():
-    update_html()
+def setup():
+    # update_html()
     rv_dict, tp_dict = parse_html()
-    store_into_class(rv_dict, tp_dict)
+    print(store_into_class(rv_dict, tp_dict))
+    
+setup()
