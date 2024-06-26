@@ -3,8 +3,6 @@ import thunderpick as tp
 import team
 import fuzzy as fuzz
 import numpy as np
-from bs4 import BeautifulSoup
-import requests
 import sqlite3
 
 
@@ -131,8 +129,17 @@ def store_into_class(rv_dict, tp_dict):
 
 
 def setup():
+    '''
+    setup function
+        - update html
+        - parse html
+        - store into classes
+        - store class into sqlite3
+    '''
     # update_html()
     rv_dict, tp_dict = parse_html()
     print(store_into_class(rv_dict, tp_dict))
     
 setup()
+
+# some TODO maybes : front facing website, operte via docker in aws
