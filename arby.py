@@ -1,9 +1,9 @@
 import rivalry as rv
 import thunderpick as tp
-import team
+from team import *
 import fuzzy as fuzz
 import numpy as np
-import sqlite3
+from database import Database
 
 
 def update_html():
@@ -48,10 +48,6 @@ def parse_html():
     tp_dict = tp.parse_thunderpick()
 
     return rv_dict, tp_dict
-
-
-# update html
-# update_html()
 
 
 def flip_bits(binary_string):
@@ -113,34 +109,96 @@ def store_into_class(rv_dict, tp_dict):
                         bits = format(index_max, "b").zfill(2)
                         bits_flipped = flip_bits(bits)
 
-                        team_a = team.Team(
+                        team_a = Team(
                             name=rv_teams[int(bits[0])],
                             odd_rv=j[rv_teams[int(bits[0])]],
                             odd_tp=l[l_key[int(bits[1])]],
                         )
-                        team_b = team.Team(
+                        team_b = Team(
                             name=rv_teams[int(bits_flipped[0])],
                             odd_rv=j[rv_teams[int(bits_flipped[0])]],
                             odd_tp=l[l_key[int(bits_flipped[1])]],
                         )
-                        match = team.Match(date=i, team_a=team_a, team_b=team_b)
+                        match = Match(date=i, team_a=team_a, team_b=team_b)
                         viable_matches.append(match)
 
     return viable_matches
 
 
+def check_ratio(odd_a, odd_b):
+    ratio = 1 / odd_a + 1 / odd_b
+
+    return ratio
+
+
+def arbitrage(match):
+    pair_a = (match["team_a_odd_rv"], match["team_b_odd_tp"])
+    pair_b = (match["team_a_odd_tp"], match["team_b_odd_rv"])
+    ratio_a = check_ratio(pair_a[0], pair_a[1])
+    ratio_b = check_ratio(pair_b[0], pair_b[1])
+
+    # no opportunity
+    if ratio_a > 1 and ratio_b > 1:
+        return
+
+    if ratio_a < ratio_b:
+        better_ratio = ratio_a
+    else:
+        better_ratio = ratio_b
+
+    investment_amount = 1000
+
+    if better_ratio == ratio_a:
+        bet_pair = ("rv", "tp")
+        team_a_bet = investment_amount / (1 + (pair_a[0] / pair_a[1]))
+        team_b_bet = investment_amount / (1 + (pair_a[1] / pair_a[0]))
+    else:
+        bet_pair = ("tp", "rv")
+        team_a_bet = investment_amount / (1 + (pair_b[1] / pair_b[0]))
+        team_b_bet = investment_amount / (1 + (pair_b[0] / pair_b[1]))
+
+    team_a_bet = round(team_a_bet,2)
+    team_b_bet = round(team_b_bet,2)
+    
+    print(
+        "By betting {team_a_bet} for {team_a} on {bet_pair_a} and by betting {team_b_bet} for {team_b} on {bet_pair_b} there is an arbitrage opportunity ".format(
+            team_a_bet=team_a_bet,
+            team_a=match["team_a_name"],
+            bet_pair_a=bet_pair[0],
+            team_b_bet=team_b_bet,
+            team_b=match["team_b_name"],
+            bet_pair_b=bet_pair[1],
+        )
+    )
+
+
 def setup():
-    '''
+    """
     setup function
         - update html
         - parse html
         - store into classes
         - store class into sqlite3
-    '''
-    # update_html()
+    """
+    update_html()
     rv_dict, tp_dict = parse_html()
-    print(store_into_class(rv_dict, tp_dict))
-    
-setup()
+    matches = store_into_class(rv_dict, tp_dict)
+    db = Database()
+
+    for i in matches:
+        db.insert_match(i)
+
+
+# setup()
+db = Database()
+team_a = Team("team_a", 1.3, 3.93)
+team_b = Team("team_b", 1.42, 2.9)
+match_test = Match("2024-07-02", team_a, team_b)
+
+db.insert_match(match_test)
+match = db.get_all_matches()[0]
+
+arbitrage(match)
+
 
 # some TODO maybes : front facing website, operte via docker in aws
