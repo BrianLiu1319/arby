@@ -138,9 +138,8 @@ def arbitrage(match):
     ratio_b = check_ratio(pair_b[0], pair_b[1])
 
     # no opportunity
-    # if ratio_a > 1 and ratio_b > 1:
-    #     print("no opportunity")
-    #     return
+    if ratio_a > 1 and ratio_b > 1:
+        return
 
     if ratio_a < ratio_b:
         better_ratio = ratio_a
@@ -179,7 +178,7 @@ def arbitrage(match):
     )
 
 
-def setup():
+def update_db():
     """
     setup function
         - update html
@@ -187,7 +186,7 @@ def setup():
         - store into classes
         - store class into sqlite3
     """
-    # update_html()
+    update_html()
     rv_dict, tp_dict = parse_html()
     matches = store_into_class(rv_dict, tp_dict)
     db = Database()
@@ -201,8 +200,9 @@ def search_opp(db=Database):
     
     for i in matches:
         arbitrage(i)
-
-# setup()
+        
+        
+update_db()
 db = Database()
 search_opp(db)
 
