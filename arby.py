@@ -91,39 +91,40 @@ def store_into_class(rv_dict, tp_dict):
         # get list of rv matches on date
         for j in rv_dict[i]:
             rv_teams = list(j.keys())
-            tp_teams = tp_dict[i]
-            # get list of tp matches on date
-            for l in tp_teams:
-                l_key = list(l.keys())
+            if i in tp_dict:
+                tp_teams = tp_dict[i]
+                # get list of tp matches on date
+                for l in tp_teams:
+                    l_key = list(l.keys())
 
-                # calculate fuzzy match ratios and match teams from rv and tp at the same time
-                ratio1 = fuzz.avg_ratio(rv_teams[0], l_key[0])
-                ratio2 = fuzz.avg_ratio(rv_teams[0], l_key[1])
-                ratio3 = fuzz.avg_ratio(rv_teams[1], l_key[0])
-                ratio4 = fuzz.avg_ratio(rv_teams[1], l_key[1])
+                    # calculate fuzzy match ratios and match teams from rv and tp at the same time
+                    ratio1 = fuzz.avg_ratio(rv_teams[0], l_key[0])
+                    ratio2 = fuzz.avg_ratio(rv_teams[0], l_key[1])
+                    ratio3 = fuzz.avg_ratio(rv_teams[1], l_key[0])
+                    ratio4 = fuzz.avg_ratio(rv_teams[1], l_key[1])
 
-                # get avg ratios and test if they are similar enough
-                ratio_list = [ratio1, ratio2, ratio3, ratio4]
-                index_max = np.argmax(ratio_list)
-                ratio_list.sort()
+                    # get avg ratios and test if they are similar enough
+                    ratio_list = [ratio1, ratio2, ratio3, ratio4]
+                    index_max = np.argmax(ratio_list)
+                    ratio_list.sort()
 
-                # if match is good pair up tp and rv and store into match
-                if ratio_list[-1] > 70 and ratio_list[-2] > 70:
-                    bits = format(index_max, "b").zfill(2)
-                    bits_flipped = flip_bits(bits)
+                    # if match is good pair up tp and rv and store into match
+                    if ratio_list[-1] > 70 and ratio_list[-2] > 70:
+                        bits = format(index_max, "b").zfill(2)
+                        bits_flipped = flip_bits(bits)
 
-                    team_a = team.Team(
-                        name=rv_teams[int(bits[0])],
-                        odd_rv=j[rv_teams[int(bits[0])]],
-                        odd_tp=l[l_key[int(bits[1])]],
-                    )
-                    team_b = team.Team(
-                        name=rv_teams[int(bits_flipped[0])],
-                        odd_rv=j[rv_teams[int(bits_flipped[0])]],
-                        odd_tp=l[l_key[int(bits_flipped[1])]],
-                    )
-                    match = team.Match(date=i, team_a=team_a, team_b=team_b)
-                    viable_matches.append(match)
+                        team_a = team.Team(
+                            name=rv_teams[int(bits[0])],
+                            odd_rv=j[rv_teams[int(bits[0])]],
+                            odd_tp=l[l_key[int(bits[1])]],
+                        )
+                        team_b = team.Team(
+                            name=rv_teams[int(bits_flipped[0])],
+                            odd_rv=j[rv_teams[int(bits_flipped[0])]],
+                            odd_tp=l[l_key[int(bits_flipped[1])]],
+                        )
+                        match = team.Match(date=i, team_a=team_a, team_b=team_b)
+                        viable_matches.append(match)
 
     return viable_matches
 
