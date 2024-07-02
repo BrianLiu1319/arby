@@ -138,8 +138,9 @@ def arbitrage(match):
     ratio_b = check_ratio(pair_b[0], pair_b[1])
 
     # no opportunity
-    if ratio_a > 1 and ratio_b > 1:
-        return
+    # if ratio_a > 1 and ratio_b > 1:
+    #     print("no opportunity")
+    #     return
 
     if ratio_a < ratio_b:
         better_ratio = ratio_a
@@ -152,22 +153,28 @@ def arbitrage(match):
         bet_pair = ("rv", "tp")
         team_a_bet = investment_amount / (1 + (pair_a[0] / pair_a[1]))
         team_b_bet = investment_amount / (1 + (pair_a[1] / pair_a[0]))
+        profit = team_a_bet * pair_a[0] - investment_amount
+        
     else:
         bet_pair = ("tp", "rv")
         team_a_bet = investment_amount / (1 + (pair_b[1] / pair_b[0]))
         team_b_bet = investment_amount / (1 + (pair_b[0] / pair_b[1]))
+        profit = team_b_bet * pair_b[0]- investment_amount
+        
 
     team_a_bet = round(team_a_bet,2)
     team_b_bet = round(team_b_bet,2)
+    profit = round(profit,2)
     
     print(
-        "By betting {team_a_bet} for {team_a} on {bet_pair_a} and by betting {team_b_bet} for {team_b} on {bet_pair_b} there is an arbitrage opportunity ".format(
+        "By betting {team_a_bet} for {team_a} on {bet_pair_a} and by betting {team_b_bet} for {team_b} on {bet_pair_b} there is an arbitrage opportunity for a profit of {profit}".format(
             team_a_bet=team_a_bet,
             team_a=match["team_a_name"],
             bet_pair_a=bet_pair[0],
             team_b_bet=team_b_bet,
             team_b=match["team_b_name"],
             bet_pair_b=bet_pair[1],
+            profit=profit
         )
     )
 
@@ -180,25 +187,24 @@ def setup():
         - store into classes
         - store class into sqlite3
     """
-    update_html()
+    # update_html()
     rv_dict, tp_dict = parse_html()
     matches = store_into_class(rv_dict, tp_dict)
     db = Database()
 
     for i in matches:
         db.insert_match(i)
+    
 
+def search_opp(db=Database):
+    matches = db.get_all_matches()
+    
+    for i in matches:
+        arbitrage(i)
 
 # setup()
 db = Database()
-team_a = Team("team_a", 1.3, 3.93)
-team_b = Team("team_b", 1.42, 2.9)
-match_test = Match("2024-07-02", team_a, team_b)
-
-db.insert_match(match_test)
-match = db.get_all_matches()[0]
-
-arbitrage(match)
+search_opp(db)
 
 
-# some TODO maybes : front facing website, operte via docker in aws
+
