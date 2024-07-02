@@ -61,8 +61,8 @@ conn = sqlite3.connect("match.db")
 c = conn.cursor()
 
 
-
-c.execute('''
+c.execute(
+    """
     CREATE TABLE IF NOT EXISTS matches (
         date TEXT,
         team_a_name TEXT,
@@ -72,42 +72,62 @@ c.execute('''
         team_b_odd_rv REAL,
         team_b_odd_tp REAL
     )
-''')
+"""
+)
 
 match = matches[0]
 
 
 def insert_match(match):
     with conn:
-        c.execute("INSERT INTO matches VALUES (\
-            :date, \
-            :team_a_name,  \
-            :team_a_odd_rv, \
-            :team_a_odd_tp, \
-            :team_b_name,  \
-            :team_b_odd_rv, \
-            :team_b_odd_tp)",
-            {
-                "date": match.date, \
-                "team_a_name": match.team_a.name, \
-                "team_a_odd_rv": match.team_a.odd_rv, \
-                "team_a_odd_tp": match.team_a.odd_tp, \
-                "team_b_name": match.team_b.name, \
-                "team_b_odd_rv": match.team_b.odd_rv, \
-                "team_b_odd_tp": match.team_b.odd_tp \
-            }
-        )
+        if not fetch_match(match):
+            c.execute(
+                "INSERT INTO matches VALUES (\
+                :date, \
+                :team_a_name,  \
+                :team_a_odd_rv, \
+                :team_a_odd_tp, \
+                :team_b_name,  \
+                :team_b_odd_rv, \
+                :team_b_odd_tp)",
+                {
+                    "date": match.date,
+                    "team_a_name": match.team_a.name,
+                    "team_a_odd_rv": match.team_a.odd_rv,
+                    "team_a_odd_tp": match.team_a.odd_tp,
+                    "team_b_name": match.team_b.name,
+                    "team_b_odd_rv": match.team_b.odd_rv,
+                    "team_b_odd_tp": match.team_b.odd_tp,
+                },
+            )
 
-def get_matches():
+
+def get_all_matches():
     c.execute("SELECT * FROM matches")
     return c.fetchall()
 
+
+def fetch_match(match):
+    with conn:
+        c.execute(
+            "SELECT * FROM matches WHERE \
+            date=:date AND \
+            team_a_name=:team_a_name AND \
+            team_b_name=:team_b_name ",
+            {
+                "date": match.date,
+                "team_a_name": match.team_a.name,
+                "team_b_name": match.team_b.name
+            }
+        )
+    return c.fetchall()
 
 
 # # commit the change action!
 # conn.commit()
 insert_match(matches[0])
-print(get_matches())
+print(get_all_matches())
+print(fetch_match(matches[0]))
 # exits our sqlite3 connection
 conn.close()
 
